@@ -1,0 +1,122 @@
+var prefixParselet = require("parselets/prefixparselet.mnd");
+var statementParselet = require("parselets/statementparselet.mnd");
+var stringParselet = require("parselets/stringparselet.mnd");
+var numberParselet = require("parselets/numberparselet.mnd");
+var infixParselet = require("parselets/infixparselet.mnd");
+var postfixParselet = require("parselets/postfixparselet.mnd");
+
+var tokenStream = require("tokenstream.mnd");
+
+var STATEMENTS = [
+    "IF",
+    "THEN",
+    "GOSUB",
+    "PRINT",
+    "INPUT"
+];
+
+// make list of expressions based on line numbers
+// if multiple expressions on one line, evaluate them all
+
+fun isStatement(token) {
+    if(token.type != "name")
+        return false;
+
+    var name = token.lexeme;
+    return name in STATEMENTS;
+}
+
+fun match(this, expected) {
+    return expected == this.tokenStream.lookAhead(0).type;
+}
+
+fun parseLineExpression(this) {
+    if(!this.match("number")) {
+        error("No preceeding line number found.");
+    }
+
+    var number = this.tokenStream.consume().lexeme;
+    return [number, this.parseExpression()];
+}
+
+fun parseExpression(this){
+    // match the preceeding line number
+    //if(!this.match("number"))
+    //    return false;
+    var left = null;
+
+    if(this.match("name")) {
+        var token = this.tokenStream.consume();
+
+        if(isStatement(token)) {
+            // parse statement expression
+            var statement = statementParselet.new(this, -1, token);
+            var statementExpression = statement.parse();
+			left = statementExpression;
+        }
+        else {
+            var name = prefixParselet.new(this, token);
+            left = name.parse();
+        }
+    }
+    else if(this.match("string")) {
+        var token = this.tokenStream.consume();
+        var str = stringParselet.new(this, token);
+
+        left = str.parse();//this.tokenStream.lookAhead(0).lexeme;
+    }
+    else if(this.match("number")) {
+        var token = this.tokenStream.consume();
+        var num = numberParselet.new(this, token);
+
+
+
+        left = num.parse();
+    }
+    else if(this.match(":")) {
+        this.tokenStream.consume();
+        left = this.parseExpression();
+    }
+
+    // Add equality sign
+    if(this.match(">") || this.match(">") || this.match(">=") || this.match("<=") || this.match("<>")) {
+        var token = this.tokenStream.consume();
+        var gt = infixParselet.new(this, token, left);
+        var gtExpression = gt.parse();
+
+        return gtExpression;
+    }
+    else if(this.match("=")) {
+        var token = this.tokenStream.consume();
+        var assign = infixParselet.new(this, token, left);
+        var assignExpression = assign.parse();
+
+        return assignExpression;
+    }
+    else if(this.match("(")) {
+        var token = this.tokenStream.consume();
+        var argument = this.parseExpression();
+        var call = postfixParselet.new(this, left.name, argument);
+
+        if(this.match(")"))
+            this.tokenStream.consume();
+        else
+            error("Missing )");
+
+        return call.parse();
+    }
+
+    return left;
+}
+
+fun new(tokens) {
+    return {
+        tokenStream: tokenStream.new(tokens),
+
+        match: match,
+        parseExpression: parseExpression,
+        parseLineExpression: parseLineExpression
+    }.enableThis();
+}
+
+return {new};

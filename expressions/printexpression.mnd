@@ -1,0 +1,14 @@
+fun run(this) {
+	//printLn(this.expression.evaluate);
+	printLn(this.expression.evaluate());
+}
+
+fun new(expression) {
+	return {
+		expression: expression,
+		type: "print",
+		run: run
+	}.enableThis();
+}
+
+return {new};

@@ -1,0 +1,42 @@
+var OPERATORS = {
+    GREATERTHAN: 0,
+    LESSTHAN: 1,
+    GREATERTHANEQUAL: 2,
+    LESSTHANEQUAL: 3,
+    EQUAL: 4,
+    NOTEQUAL: 5
+};
+
+fun evaluate(this) {
+    if(this.comparison == OPERATORS.GREATERTHAN) {
+        return this.left.evaluate() > this.right.evaluate();
+    }
+    else if(this.comparison == OPERATORS.LESSTHAN) {
+        return this.left.evaluate() < this.right.evaluate();
+    }
+    else if(this.comparison == OPERATORS.GREATERTHANEQUAL) {
+        return this.left.evaluate() >= this.right.evaluate();
+    }
+    else if(this.comparison == OPERATORS.LESSTHANEQUAL) {
+        return this.left.evaluate() <= this.right.evaluate();
+    }
+    else if(this.comparison == OPERATORS.EQUAL) {
+        return this.left.evaluate() == this.right.evaluate();
+    }
+    else if(this.comparison == OPERATORS.NOTEQUAL) {
+        return this.left.evaluate() != this.right.evaluate();
+    }
+}
+
+fun new(comparison, left, right) {
+    return {
+        comparison: comparison,
+        left: left,
+        right: right,
+
+        evaluate: evaluate,
+        type:"boolean"
+    }.enableThis();
+}
+
+return {new};

@@ -1,0 +1,19 @@
+fun run(this) {
+    //error("`IF' not yet implemented");
+    //printLn(this.condition);
+    //printLn(this.condition.type);
+    if(this.condition.evaluate()) {
+        this.branch.run();
+    }
+}
+
+fun new(condition, branch) {
+    return {
+        condition: condition,
+        branch: branch,
+        type: "if",
+        run: run
+    }.enableThis();
+}
+
+return {new};

@@ -1,0 +1,13 @@
+fun evaluate(this) {
+    error("`name.evaluate` not yet implemented");
+}
+
+fun new(name) {
+    return {
+        name: name,
+        type: "name",
+        evaluate: evaluate
+    }.enableThis();
+}
+
+return {new};

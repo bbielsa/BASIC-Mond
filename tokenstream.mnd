@@ -1,0 +1,31 @@
+fun lookAhead(this, distance) {
+    if(this.position + distance < this.tokens.length())
+        return this.tokens[this.position + distance];
+}
+
+// return the consumed token?
+fun consume(this) {
+    var token = this.tokens[this.position];
+    this.tokens = this.tokens.removeAt(this.position);
+    //printLn(token.lexeme);
+    return token;
+}
+
+fun new(tokens) {
+    return {
+        tokens: tokens,
+        position: 0,
+
+        lookAhead: lookAhead,
+        consume: consume
+    }.enableThis();
+}
+
+/*
+var ts = new(["hello", "world", "!", ":)"]);
+
+for(var i = 0; i < 4; i++)
+    printLn(ts.consume());
+*/
+
+return {new};

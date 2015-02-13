@@ -1,0 +1,31 @@
+var statementExpression = require("expressions/statementexpression.mnd");
+var printExpression = require("expressions/printexpression.mnd");
+var ifExpression = require("expressions/ifexpression.mnd");
+var thenExpression = require("expressions/thenexpression.mnd");
+
+fun parse(this) {
+    var operand = this.parser.parseExpression();
+
+    if(this.token.lexeme == "PRINT")
+        return printExpression.new(operand);
+    else if(this.token.lexeme == "IF") {
+        var condition = operand;
+        var branch = this.parser.parseExpression();
+        return ifExpression.new(condition, branch);
+    }
+    else if(this.token.lexeme == "THEN") {
+        return thenExpression.new(operand);
+    }
+}
+
+fun new(parser, line, token) {
+    return {
+        line: line,
+        token: token,
+        parser: parser,
+
+        parse: parse
+    }.enableThis();
+}
+
+return {new};

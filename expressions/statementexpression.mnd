@@ -1,0 +1,12 @@
+fun evaluate() {
+
+}
+
+fun new(operand) {
+    return {
+        evaluate: evaluate,
+        type:"statement"
+    }.enableThis();
+}
+
+return {new};

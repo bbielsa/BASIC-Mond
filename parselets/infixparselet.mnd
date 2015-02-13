@@ -1,0 +1,39 @@
+var booleanExpression = require("expressions/booleanexpression.mnd");
+var assignExpression = require("expressions/assignexpression.mnd");
+
+var OPERATORS = {
+    ">": 0,
+    "<": 1,
+    ">=": 2,
+    "<=": 3,
+    "<>": 5,
+    "=": 6
+};
+
+fun parse(this) {
+    var right = this.parser.parseExpression();
+
+    if(OPERATORS[this.token.lexeme] != OPERATORS["="])
+        return booleanExpression.new(OPERATORS[this.token.lexeme], this.left, right);
+    else {
+        
+
+
+        if(this.left.type != "name")
+            error("Cannot assign to non-name expression");
+
+        return assignExpression.new(this.left, right);
+    }
+}
+
+fun new(parser, token, left) {
+    return {
+        token: token,
+        parser: parser,
+        left: left,
+
+        parse: parse
+    }.enableThis();
+}
+
+return {new};

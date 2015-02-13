@@ -1,0 +1,8 @@
+fun new(num) {
+    return {
+        evaluate: fun() -> num,
+        type:"number"
+    }.enableThis();
+}
+
+return {new};

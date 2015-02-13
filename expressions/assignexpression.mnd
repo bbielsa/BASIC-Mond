@@ -1,0 +1,15 @@
+fun run(this) {
+
+}
+
+fun new(name, right) {
+    return {
+        name: name,
+        right: right,
+        type: "assign",
+        evaluate: fun() -> right.evaluate(),
+        run: run
+    }.enableThis();
+}
+
+return {new};

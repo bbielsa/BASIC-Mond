@@ -1,0 +1,32 @@
+var stringExpression = require("expressions/stringexpression.mnd");
+
+fun rep(str, times) {
+    var s = "";
+
+    for(var i = 0; i < times; i++)
+        s += str;
+
+    return s;
+}
+
+var FUNCTIONS = {
+    TAB: fun(times) -> rep("\t", times),
+    FART: fun(times) -> rep("FART", times)
+};
+
+
+fun evaluate(this) {
+    return FUNCTIONS[this.name](this.argument.evaluate());
+}
+
+fun new(name, argument) {
+    return {
+        name: name,
+        argument: argument,
+        type: "call",
+        evaluate: evaluate,
+        run: evaluate
+    }.enableThis();
+}
+
+return {new};

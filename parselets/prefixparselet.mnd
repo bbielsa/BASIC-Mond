@@ -1,0 +1,15 @@
+var booleanExpression = require("expressions/booleanexpression.mnd");
+var nameExpression = require("expressions/nameexpression.mnd");
+
+fun parse(this) {
+    return nameExpression.new(this.token.lexeme);
+}
+
+fun new(parser, token) {
+    return {
+        token: token,
+        parse: parse
+    }.enableThis();
+}
+
+return {new};

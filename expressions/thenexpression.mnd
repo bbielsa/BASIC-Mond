@@ -1,0 +1,14 @@
+fun run(this) {
+    printLn("DESTINATION:\t" + this.branch.evaluate());
+}
+
+fun new(branch) {
+    //printLn(branch);
+    return {
+        branch: branch,
+        type: "then",
+        run: run
+    }.enableThis();
+}
+
+return {new};

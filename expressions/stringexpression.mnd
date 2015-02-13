@@ -1,0 +1,8 @@
+fun new(str) {
+    return {
+        evaluate: fun() -> str,
+        type: "string"
+    }.enableThis();
+}
+
+return {new};

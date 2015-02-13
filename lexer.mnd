@@ -1,0 +1,176 @@
+var LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+var SYMBOLS = ";:=+-*/()<>";
+var TOKENS = {
+    NUMBER: 0,
+    LETTER: 1,
+    QUOTE: 2,
+    WHITESPACE: 3,
+    SYMBOL: 4,
+    EOF: -1
+};
+
+fun type(token) {
+    var code = token.charCodeAt(0);
+
+    if(token == "\"" || token == "'")
+        return TOKENS.QUOTE;
+    else if(code >= 48 && code <= 57)
+        return TOKENS.NUMBER;
+    else if(LETTERS.indexOf(token) > -1)
+        return TOKENS.LETTER;
+    else if(token.trim() == "")
+        return TOKENS.WHITESPACE;
+    else if(SYMBOLS.indexOf(token) > -1)
+        return TOKENS.SYMBOL;
+}
+
+fun next(this) {
+    return this.input.charAt(++this.position);
+}
+
+fun hasmore(this) {
+    return this.position + 1 < this.input.length();
+}
+
+fun current(this) {
+    return this.input.charAt(this.position);
+}
+
+fun take(this, expected) {
+    if(type(expected) == type(this._next()))
+        return true;
+
+    return false;
+}
+
+
+fun peek(this, forward) {
+    forward = forward || 1;
+
+    if(forward + this.position < this.input.length())
+        return this.input.charAt(forward + this.position);
+}
+
+fun scanString(this) {
+    var str = "";
+    var n = this._next();; //skip the first '
+
+    while(type(n) != TOKENS.QUOTE) {
+        str += n;
+
+        if(!this._hasMore())
+            break;
+
+        n = this._next();;
+    }
+
+    return str;
+}
+
+fun scanNumber(this) {
+    var num = "";
+    var n = this._current();
+
+    while(type(n) == TOKENS.NUMBER)
+    {
+        num += n;
+
+        if(!this._hasMore())
+            break;
+
+        if(type(this._peek(1)) == TOKENS.NUMBER)
+            n = this._next();
+        else
+            break;
+    }
+
+    return Json.deserialize(num);
+}
+
+fun scanName(this) {
+    var name = "";
+    var n = this._current();
+
+    while(type(n) == TOKENS.LETTER)
+    {
+        name += n;
+
+        if(!this._hasMore())
+            break;
+
+        if(type(this._peek(1)) == TOKENS.LETTER)
+            n = this._next();
+        else
+            break;
+
+    }
+    return name;
+}
+
+// breaking with different symbols next to each other
+// FUNC():FUNC()
+fun scanSymbol(this) {
+    var sym = "";
+    var s = this._current();
+
+    while(type(s) == TOKENS.SYMBOL) {
+        sym += s;
+
+        if(!this._hasMore())
+            break;
+
+        if(type(this._peek(1)) == TOKENS.SYMBOL)
+            s = this._next();
+        else
+            break;
+    }
+
+    return sym;
+}
+
+fun scan(this) {
+    var n = this._current();
+
+    while(this.position < this.input.length())
+    {
+        if(type(n) == TOKENS.QUOTE)
+            this.tokens.add({type: "string", lexeme: this._scanString()});
+        else if(type(n) == TOKENS.NUMBER)
+            this.tokens.add({type: "number", lexeme: this._scanNumber()});
+        else if(type(n) == TOKENS.LETTER)
+            this.tokens.add({type: "name", lexeme: this._scanName()});
+        else if(type(n) == TOKENS.SYMBOL)
+        {
+            var symbol = this._scanSymbol();
+            this.tokens.add({type: symbol, lexeme: symbol});
+        }
+
+        if(this._hasMore())
+            n = this._next();
+        else
+            break;
+    }
+
+    return this.tokens;
+}
+
+fun new(input) {
+    return {
+        input: input,
+        position: 0,
+        tokens: [],
+
+        scan: scan,
+
+        _scanString: scanString,
+        _scanNumber: scanNumber,
+        _scanName: scanName,
+        _scanSymbol: scanSymbol,
+        _current: current,
+        _hasMore: hasmore,
+        _next: next,
+        _peek: peek
+    }.enableThis();
+}
+
+return {new};
