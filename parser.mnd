@@ -15,9 +15,6 @@ var STATEMENTS = [
     "INPUT"
 ];
 
-// make list of expressions based on line numbers
-// if multiple expressions on one line, evaluate them all
-
 fun isStatement(token) {
     if(token.type != "name")
         return false;
@@ -40,9 +37,6 @@ fun parseLineExpression(this) {
 }
 
 fun parseExpression(this){
-    // match the preceeding line number
-    //if(!this.match("number"))
-    //    return false;
     var left = null;
 
     if(this.match("name")) {

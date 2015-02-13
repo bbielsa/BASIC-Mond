@@ -1,6 +1,8 @@
 fun run(this) {
-	//printLn(this.expression.evaluate);
-	printLn(this.expression.evaluate());
+	if(!this.expression == null)
+		printLn(this.expression.evaluate());
+	else
+		printLn("\n");
 }
 
 fun new(expression) {

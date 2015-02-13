@@ -1,24 +1,9 @@
 var lexer = require("lexer.mnd");
 var parser = require("parser.mnd");
-
-
-//var l = lexer.new("PRINT 'HELLO';'WORLD'");
-//var l = lexer.new("IF 2>1 PRINT 'HI';'FP Programmers' IF 1>0 PRINT'IM NOT GAY'");
-//var l = lexer.new("PRINT 'fart' <> 1");
 var l = lexer.new(readLn());
-
 var tokens = l.scan();
 var p = parser.new(tokens);
-
 var ast = [];
-//var exp = p.parseLineExpression();
-/*
-while(exp) {
-    ast.add(exp);
-    printLn("DONE!");
-    exp = p.parseLineExpression();
-}
-*/
 
 for(var line = 0; line < l.input.split("\n").length(); line++) {
     ast.add(p.parseLineExpression());
@@ -26,7 +11,3 @@ for(var line = 0; line < l.input.split("\n").length(); line++) {
 
 foreach(var e in ast)
     e[1].run();
-
-//var exp = p.parseLineExpression();
-//printLn(exp[0]);
-//exp[1].run();
