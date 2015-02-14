@@ -1,14 +1,11 @@
 var numberExpression = require("expressions/numberExpression.mnd");
 
-fun parse(this) {
-    return numberExpression.new(this.token.lexeme);
+fun parse(this, parser, token) {
+    return numberExpression.new(token.lexeme);
 }
 
-fun new(parser, token) {
+fun new() {
     return {
-        token: token,
-        parser: parser,
-
         parse: parse
     }.enableThis();
 }

@@ -1,0 +1,7 @@
+var lexer = require("lexer.mnd");
+var parser = require("parser.mnd");
+
+var tokens = lexer.new("A = 1 - 2").scan();
+var p = parser.new(tokens);
+var exp = p.parseExpression(0);
+//printLn(exp.serialize());

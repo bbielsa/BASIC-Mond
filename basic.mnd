@@ -35,6 +35,7 @@ foreach(var t in tokens)
 */
 
 var p = parser.new(tokens);
+printLn(p.tokenStream.lookAhead(0).type, p.getPrecedence());
 var expressions = [];
 
 for(var line = 0; line < l.input.split("\n").length(); line++) {

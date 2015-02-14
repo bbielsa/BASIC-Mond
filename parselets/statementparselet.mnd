@@ -7,48 +7,44 @@ var gotoExpression = require("expressions/gotoexpression.mnd");
 var returnExpression = require("expressions/returnexpression.mnd");
 var endExpression = require("expressions/endexpression.mnd");
 
-fun parse(this) {
-    var operand = this.parser.parseExpression();
+fun parse(this, parser, token) {
+    var operand = parser.parseExpression();
 
-    if(this.token.lexeme == "PRINT") {
+    if(token.lexeme == "PRINT") {
         var expressions = [operand];
-        while(this.parser.tokenStream.lookAhead(0).type == ";") {
-            this.parser.tokenStream.consume();
-            expressions.add(this.parser.parseExpression());
+        while(parser.tokenStream.lookAhead(0).type == ";") {
+            parser.tokenStream.consume();
+            expressions.add(parser.parseExpression());
         }
         return printExpression.new(expressions);
     }
-    else if(this.token.lexeme == "IF") {
+    else if(token.lexeme == "IF") {
         var condition = operand;
-        var branch = this.parser.parseExpression();
+        var branch = parser.parseExpression();
         return ifExpression.new(condition, branch);
     }
-    else if(this.token.lexeme == "THEN") {
+    else if(token.lexeme == "THEN") {
         return thenExpression.new(operand);
     }
-    else if(this.token.lexeme == "INPUT") {
+    else if(token.lexeme == "INPUT") {
         return inputExpression.new(operand);
     }
-    else if(this.token.lexeme == "GOSUB") {
+    else if(token.lexeme == "GOSUB") {
         return gosubExpression.new(operand);
     }
-    else if(this.token.lexeme == "GOTO") {
+    else if(token.lexeme == "GOTO") {
         return gotoExpression.new(operand);
     }
-    else if(this.token.lexeme == "RETURN") {
+    else if(token.lexeme == "RETURN") {
         return returnExpression.new();
     }
-    else if(this.token.lexeme == "END") {
+    else if(token.lexeme == "END") {
         return endExpression.new();
     }
 }
 
-fun new(parser, line, token) {
+fun new() {
     return {
-        line: line,
-        token: token,
-        parser: parser,
-
         parse: parse
     }.enableThis();
 }

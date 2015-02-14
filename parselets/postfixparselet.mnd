@@ -1,16 +1,11 @@
 var callExpression = require("expressions/callexpression.mnd");
 
-fun parse(this) {
-    //return numberExpression.new(this.token.lexeme);
-    //var argument = this.parser.parseExpression();
-    return callExpression.new(this.name, this.argument);
+fun parse(this, parser, name, argument) {
+    return callExpression.new(name, argument);
 }
 
-fun new(parser, name, argument) {
+fun new() {
     return {
-        name: name,
-        parser: parser,
-        argument: argument,
         parse: parse
     }.enableThis();
 }

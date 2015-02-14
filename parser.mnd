@@ -53,12 +53,59 @@ fun parseLineExpression(this) {
     return [number, multipleExpression || left];
 }
 
-fun parseExpression(this){
+fun getPrecedence(this) {
+    var token = this.tokenStream.lookAhead(0).type;
+    printLn("PRECEDENCE:\t" + token);
+    if(token == "=") {
+        return 1;
+    }
+    else if(token == ">" || token == "<" || token == ">=" || token == "<=" || token == "<>") {
+        return 2;
+    }
+    else if(token == "+" || token == "-") {
+        return 3;
+    }
+    else if(token == "*" || token == "/") {
+        return 4;
+    }
+    else if(token == "name" || token == "string" || token == "number") {
+        return 6;
+    }
+    else if(token == "(") {
+        return 7;
+    }
+
+    return 0;
+}
+
+fun parseExpression(this, precedence) {
+    var token = this.tokenStream.consume();
+    var prefix = this.prefixParselets[token.type];
+
+    if(prefix == undefined)
+        error("Illegal token `{0}`".format(token.lexeme));
+
+    var left = prefix.parse(this, token);
+
+    printLn(this.getPrecedence());
+
+    // does not handle postfix expressions yet
+    while(precedence < this.getPrecedence()) {
+        token = this.tokenStream.consume();
+        var infix = this.infixParselets[token.type];
+        printLn(token.type);
+        var fart = infix.parse(this, token, left);
+        printLn(fart.serialize());
+    }
+
+    return left;
+}
+
+fun _parseExpression(this){
     var left = null;
+    var token = this.tokenStream.consume();
 
     if(this.match("name")) {
-        var token = this.tokenStream.consume();
-
         if(isStatement(token)) {
             var statement = statementParselet.new(this, -1, token);
             var statementExpression = statement.parse();
@@ -70,43 +117,35 @@ fun parseExpression(this){
         }
     }
     else if(this.match("string")) {
-        var token = this.tokenStream.consume();
         var str = stringParselet.new(this, token);
-
         left = str.parse();//this.tokenStream.lookAhead(0).lexeme;
     }
     else if(this.match("number")) {
-        var token = this.tokenStream.consume();
         var num = numberParselet.new(this, token);
-
         left = num.parse();
     }
 
-
+    token = this.tokenStream.consume();
     // Add equality sign
     if(this.match(">") || this.match("<") || this.match(">=") || this.match("<=") || this.match("<>")) {
-        var token = this.tokenStream.consume();
         var gt = infixParselet.new(this, token, left);
         var gtExpression = gt.parse();
 
         return gtExpression;
     }
     if(this.match("+") || this.match("-") || this.match("*") || this.match("/")) {
-        var token = this.tokenStream.consume();
         var math = infixParselet.new(this, token, left);
         var mathExpression = math.parse();
 
         return mathExpression;
     }
     else if(this.match("=")) {
-        var token = this.tokenStream.consume();
         var assign = infixParselet.new(this, token, left);
         var assignExpression = assign.parse();
 
         return assignExpression;
     }
     else if(this.match("(")) {
-        var token = this.tokenStream.consume();
         var argument = this.parseExpression();
         var call = postfixParselet.new(this, left.name, argument);
         var callExpression = call.parse();
@@ -126,10 +165,31 @@ fun parseExpression(this){
 fun new(tokens) {
     return {
         tokenStream: tokenStream.new(tokens),
-
         match: match,
+        prefixParselets: {
+            name: prefixParselet.new(),
+            number: numberParselet.new(),
+            statement: statementParselet.new(),
+            string: stringParselet.new()
+        },
+        infixParselets: {
+            ">": infixParselet.new(),
+            "<": infixParselet.new(),
+            ">=": infixParselet.new(),
+            "<=": infixParselet.new(),
+            "<>": infixParselet.new(),
+            "=": infixParselet.new(),
+            "+": infixParselet.new(),
+            "-": infixParselet.new(),
+            "*": infixParselet.new(),
+            "/": infixParselet.new(),
+        },
+        postfixParselets: {
+            "(": postfixParselet.new()
+        },
         parseExpression: parseExpression,
-        parseLineExpression: parseLineExpression
+        parseLineExpression: parseLineExpression,
+        getPrecedence: getPrecedence
     }.enableThis();
 }
 

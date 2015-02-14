@@ -51,6 +51,7 @@ test("10 GOSUB 30
 test("10 GOSUB 69
 20 END
 69 A = 69", "A", 69);
+test("10 A = 1 - 2 - 3", "A", -4);
 
 // Tests for hamurabi
 test("100 Z=0: P=95:S=2800: H=3000: E=H-S", "E", 200);

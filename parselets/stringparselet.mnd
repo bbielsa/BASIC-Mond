@@ -1,22 +1,11 @@
 var stringExpression = require("expressions/stringExpression.mnd");
 
-fun parse(this) {
-    /*
-    while(this.parser.tokenStream.lookAhead(0).type == ";") {
-        this.parser.tokenStream.consume();
-        var exp = this.parser.parseExpression();
-        this.expressions.add(exp);
-    }
-    */
-    //printLn("LEXEME:\t" + this.token.lexeme);
-    return stringExpression.new(this.token.lexeme);
+fun parse(this, parser, token) {
+    return stringExpression.new(token.lexeme);
 }
 
-fun new(parser, token) {
+fun new() {
     return {
-        token: token,
-        parser: parser,
-
         parse: parse
     }.enableThis();
 }
