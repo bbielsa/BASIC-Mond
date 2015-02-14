@@ -1,9 +1,8 @@
-fun run(this) {
-    printLn("DESTINATION:\t" + this.branch.evaluate());
+fun run(this, interpreter) {
+    interpreter.setLine(this.branch.evaluate());
 }
 
 fun new(branch) {
-    //printLn(branch);
     return {
         branch: branch,
         type: "then",

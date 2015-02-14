@@ -1,13 +1,35 @@
 var lexer = require("lexer.mnd");
 var parser = require("parser.mnd");
-var l = lexer.new(readLn());
+var interpreter = require("interpreter.mnd");
+
+//var l = lexer.new(readLn());
+/*var l = lexer.new("10 PRINT 'HELLO': PRINT 'WORLD': a = 1
+20 PRINT 'NEW LINE!!!'
+30 PRINT FART(20)
+40 PRINT 'THIS IS A TEST'
+50 IF 1 <> 2 THEN 10");
+*/
+var l = lexer.new("10 PRINT 'HELLO WORLD'
+20 IF 1<2 THEN 10");
+
 var tokens = l.scan();
+
+foreach(var t in tokens)
+    printLn("{0}: {1}".format(t.type, t.lexeme));
+
 var p = parser.new(tokens);
-var ast = [];
+var expressions = [];
 
 for(var line = 0; line < l.input.split("\n").length(); line++) {
-    ast.add(p.parseLineExpression());
+    var lineExpression = p.parseLineExpression();
+    var lineNumber = lineExpression[0];
+    var expression = lineExpression[1];
+
+    expressions.add({line: lineNumber, expression: expression});
+
+    if(p.match("newline"))
+        p.tokenStream.consume(); // consume new line
 }
 
-foreach(var e in ast)
-    e[1].run();
+var i = interpreter.new(expressions);
+i.interpret();

@@ -1,0 +1,49 @@
+fun interpret(this) {
+    while(this.running)
+        this.step();
+
+    printLn("\nInterpreter halted");
+}
+
+fun step(this) {
+    if(this.line >= this.expressions.length())
+    {
+        this.running = false;
+        return;
+    }
+    this.expressions[this.line++].expression.run(this);
+}
+
+// destination is in BASIC line units, not index of expression in `expressions`
+fun setLine(this, destination) {
+    var i = 0;
+    foreach(var exp in this.expressions) {
+        if(exp.line == destination)
+        {
+            this.line = i;
+            return;
+        }
+
+        i++;
+    }
+
+    // if line doesnt exist stop execution
+    this.running = false;
+}
+
+fun new(expressions) {
+    return {
+        expressions: expressions,
+        line: 0,
+        running: true,
+
+        variables: [],
+        functions: [],
+
+        interpret: interpret,
+        step: step,
+        setLine: setLine
+    }.enableThis();
+}
+
+return {new};

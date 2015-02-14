@@ -1,5 +1,5 @@
 fun run(this) {
-	if(!this.expression == null)
+	if(this.expression)
 		printLn(this.expression.evaluate());
 	else
 		printLn("\n");

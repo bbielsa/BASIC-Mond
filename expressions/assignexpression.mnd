@@ -1,4 +1,8 @@
-fun run(this) {
+fun evaluate(this) {
+    return this.right.evaluate();
+}
+
+fun run(this, interpreter) {
 
 }
 
@@ -7,7 +11,7 @@ fun new(name, right) {
         name: name,
         right: right,
         type: "assign",
-        evaluate: fun() -> right.evaluate(),
+        evaluate: evaluate,
         run: run
     }.enableThis();
 }

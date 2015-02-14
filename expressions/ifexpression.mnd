@@ -1,9 +1,6 @@
-fun run(this) {
-    //error("`IF' not yet implemented");
-    //printLn(this.condition);
-    //printLn(this.condition.type);
+fun run(this, interpreter) {
     if(this.condition.evaluate()) {
-        this.branch.run();
+        this.branch.run(interpreter);
     }
 }
 

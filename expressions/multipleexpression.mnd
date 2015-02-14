@@ -1,0 +1,15 @@
+fun run(this) {
+    foreach(var exp in this.expressions) {
+        exp.run();
+    }
+}
+
+fun new(expressions) {
+    return {
+        expressions: expressions,
+        type: "multiple",
+        run: run
+    }.enableThis();
+}
+
+return {new};

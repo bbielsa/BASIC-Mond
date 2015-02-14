@@ -1,4 +1,3 @@
-var statementExpression = require("expressions/statementexpression.mnd");
 var printExpression = require("expressions/printexpression.mnd");
 var ifExpression = require("expressions/ifexpression.mnd");
 var thenExpression = require("expressions/thenexpression.mnd");
@@ -11,6 +10,7 @@ fun parse(this) {
     else if(this.token.lexeme == "IF") {
         var condition = operand;
         var branch = this.parser.parseExpression();
+        printLn("BRANCH:\t" + branch);
         return ifExpression.new(condition, branch);
     }
     else if(this.token.lexeme == "THEN") {

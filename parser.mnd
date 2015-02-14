@@ -4,6 +4,7 @@ var stringParselet = require("parselets/stringparselet.mnd");
 var numberParselet = require("parselets/numberparselet.mnd");
 var infixParselet = require("parselets/infixparselet.mnd");
 var postfixParselet = require("parselets/postfixparselet.mnd");
+var multipleParselet = require("parselets/multipleparselet.mnd");
 
 var tokenStream = require("tokenstream.mnd");
 
@@ -29,11 +30,24 @@ fun match(this, expected) {
 
 fun parseLineExpression(this) {
     if(!this.match("number")) {
+        printLn("TOKEN:\t" + this.tokenStream.lookAhead(0).type);
         error("No preceeding line number found.");
     }
 
     var number = this.tokenStream.consume().lexeme;
-    return [number, this.parseExpression()];
+    var left = this.parseExpression();
+    var multiple = multipleParselet.new(this, left);
+    var multipleExpression = null;
+
+    while(this.match(":")) {
+        this.tokenStream.consume();
+        multiple.expressions.add(this.parseExpression());
+    }
+
+    if(multiple.expressions.length() > 1)
+        multipleExpression = multiple.parse();
+
+    return [number, multipleExpression || left];
 }
 
 fun parseExpression(this){
@@ -43,7 +57,6 @@ fun parseExpression(this){
         var token = this.tokenStream.consume();
 
         if(isStatement(token)) {
-            // parse statement expression
             var statement = statementParselet.new(this, -1, token);
             var statementExpression = statement.parse();
 			left = statementExpression;
@@ -63,17 +76,12 @@ fun parseExpression(this){
         var token = this.tokenStream.consume();
         var num = numberParselet.new(this, token);
 
-
-
         left = num.parse();
     }
-    else if(this.match(":")) {
-        this.tokenStream.consume();
-        left = this.parseExpression();
-    }
+
 
     // Add equality sign
-    if(this.match(">") || this.match(">") || this.match(">=") || this.match("<=") || this.match("<>")) {
+    if(this.match(">") || this.match("<") || this.match(">=") || this.match("<=") || this.match("<>")) {
         var token = this.tokenStream.consume();
         var gt = infixParselet.new(this, token, left);
         var gtExpression = gt.parse();
@@ -91,14 +99,16 @@ fun parseExpression(this){
         var token = this.tokenStream.consume();
         var argument = this.parseExpression();
         var call = postfixParselet.new(this, left.name, argument);
+        var callExpression = call.parse();
 
         if(this.match(")"))
             this.tokenStream.consume();
         else
             error("Missing )");
 
-        return call.parse();
+        return callExpression;
     }
+
 
     return left;
 }
