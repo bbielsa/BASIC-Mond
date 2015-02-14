@@ -1,5 +1,8 @@
-fun evaluate(this) {
-    error("`name.evaluate` not yet implemented");
+fun evaluate(this, interpreter) {
+    // this is used by call and math for function names and variable names
+    // if the variable does not exist, this will return the name
+    // fix this!
+    return interpreter.variables[this.name] || this.name;
 }
 
 fun new(name) {

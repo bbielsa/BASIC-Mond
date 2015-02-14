@@ -1,0 +1,13 @@
+fun run(this, interpreter) {
+    interpreter.interpretSubroutine(this.branch.evaluate());
+}
+
+fun new(branch) {
+    return {
+        branch: branch,
+        type: "gosub",
+        run: run
+    }.enableThis();
+}
+
+return {new};

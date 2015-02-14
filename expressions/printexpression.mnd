@@ -1,13 +1,15 @@
-fun run(this) {
-	if(this.expression)
-		printLn(this.expression.evaluate());
-	else
-		printLn("\n");
+fun run(this, interpreter) {
+	var value = "";
+
+	for(var e = 0; e < this.expressions.length(); e++)
+		value += this.expressions[e].evaluate(interpreter) + " ";
+
+	printLn(value);
 }
 
-fun new(expression) {
+fun new(expressions) {
 	return {
-		expression: expression,
+		expressions: expressions,
 		type: "print",
 		run: run
 	}.enableThis();

@@ -1,8 +1,31 @@
+fun rep(str, times) {
+    var s = "";
+
+    for(var i = 0; i < times; i++)
+        s += str;
+
+    return s;
+}
+var random = Random();
+
+fun FART(times) {
+    printLn(times);
+    return rep("FART ", times);
+}
+
+fun INT(number) {
+    var str = number + "";
+    str = str.split(".")[0];
+
+    return Json.deserialize(str);
+}
+
 fun interpret(this) {
     while(this.running)
         this.step();
 
-    printLn("\nInterpreter halted");
+    if(!this.ignoring)
+        printLn("\nInterpreter halted");
 }
 
 fun step(this) {
@@ -11,7 +34,28 @@ fun step(this) {
         this.running = false;
         return;
     }
-    this.expressions[this.line++].expression.run(this);
+
+    if(this.ignoring) {
+        if(this.expressions[this.line].expression.type != "print")
+            this.expressions[this.line++].expression.run(this);
+        else
+            this.line++;
+    }
+    else
+        this.expressions[this.line++].expression.run(this);
+
+}
+
+fun interpretSubroutine(this, start) {
+    var line = this.line;
+    this.setLine(start);
+    this.inSubroutine = true;
+
+    while(this.running && this.inSubroutine) {
+        this.step();
+    }
+
+    this.line = line;
 }
 
 // destination is in BASIC line units, not index of expression in `expressions`
@@ -31,16 +75,23 @@ fun setLine(this, destination) {
     this.running = false;
 }
 
-fun new(expressions) {
+fun new(expressions, ignoreOutput) {
     return {
         expressions: expressions,
         line: 0,
         running: true,
-
-        variables: [],
-        functions: [],
+        ignoring: ignoreOutput,
+        inSubroutine: false,
+        variables: {},
+        functions: {
+            TAB: fun(times) -> rep("  ", times),
+            RND: fun(max) -> random.next(max + 1),
+            FART: FART,
+            INT: INT
+        },
 
         interpret: interpret,
+        interpretSubroutine: interpretSubroutine,
         step: step,
         setLine: setLine
     }.enableThis();

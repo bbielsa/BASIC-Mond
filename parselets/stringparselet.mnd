@@ -1,15 +1,14 @@
 var stringExpression = require("expressions/stringExpression.mnd");
 
 fun parse(this) {
-    if(this.parser.tokenStream.lookAhead(0).type == ";") {
-        this.parser.tokenStream.consume(); // consume the ;
-
-        var left = stringExpression.new(this.token.lexeme);
-        var right = this.parser.parseExpression();
-
-        return stringExpression.new(left.evaluate() + " " + right.evaluate());
+    /*
+    while(this.parser.tokenStream.lookAhead(0).type == ";") {
+        this.parser.tokenStream.consume();
+        var exp = this.parser.parseExpression();
+        this.expressions.add(exp);
     }
-
+    */
+    //printLn("LEXEME:\t" + this.token.lexeme);
     return stringExpression.new(this.token.lexeme);
 }
 

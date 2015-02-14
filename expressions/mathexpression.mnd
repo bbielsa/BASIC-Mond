@@ -1,0 +1,34 @@
+var OPERATORS = {
+    ADD: 7,
+    SUBTRACT: 8,
+    MULTIPLY: 9,
+    DIVIDE: 10
+};
+
+fun evaluate(this, interpreter) {
+    if(this.operator == OPERATORS.ADD) {
+        return this.left.evaluate(interpreter) + this.right.evaluate(interpreter);
+    }
+    else if(this.operator == OPERATORS.SUBTRACT) {
+        return this.left.evaluate(interpreter) - this.right.evaluate(interpreter);
+    }
+    else if(this.operator == OPERATORS.MULTIPLY) {
+        return this.left.evaluate(interpreter) * this.right.evaluate(interpreter);
+    }
+    else if(this.operator == OPERATORS.DIVIDE) {
+        return this.left.evaluate(interpreter) / this.right.evaluate(interpreter);
+    }
+}
+
+fun new(operator, left, right) {
+    return {
+        operator: operator,
+        left: left,
+        right: right,
+
+        evaluate: evaluate,
+        type:"math"
+    }.enableThis();
+}
+
+return {new};

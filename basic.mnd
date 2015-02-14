@@ -9,13 +9,30 @@ var interpreter = require("interpreter.mnd");
 40 PRINT 'THIS IS A TEST'
 50 IF 1 <> 2 THEN 10");
 */
-var l = lexer.new("10 PRINT 'HELLO WORLD'
+/*
+var l = lexer.new("10 PRINT RND(69)
 20 IF 1<2 THEN 10");
+*/
+//var l = lexer.new("20 PRINT TAB(15) ; 'CREATIVE COMPUTING  MORRISTOWN, NEW JERSEY'");
+//var l = lexer.new("10 INPUT A");
+/*var l = lexer.new("0 A = 69
+10 PRINT 'HELLO';'WORLD';A");*/
+//var l = lexer.new("10 A = FART( RND(6) )");
+/*var l = lexer.new("10 A = 79
+20 B = 10
+30 C = A - B");*/
+/*var l = lexer.new("10 A = RND(69)");*/
 
+//var l = lexer.new("10 PRINT 'HELLO WORLD!':PRINT:PRINT:PRINT 'HELLO AGAIN!!' PRINT RND(69)");
+var l = lexer.new("10 GOSUB 30
+20 PRINT 'should see this once'
+30 PRINT 'YAY!'
+40 RETURN");
 var tokens = l.scan();
-
+/*
 foreach(var t in tokens)
     printLn("{0}: {1}".format(t.type, t.lexeme));
+*/
 
 var p = parser.new(tokens);
 var expressions = [];
@@ -33,3 +50,4 @@ for(var line = 0; line < l.input.split("\n").length(); line++) {
 
 var i = interpreter.new(expressions);
 i.interpret();
+printLn(i.variables["A"]);

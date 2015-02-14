@@ -1,0 +1,12 @@
+fun run(this, interpreter) {
+    interpreter.running = false;
+}
+
+fun new() {
+    return {
+        type: "end",
+        run: run
+    }.enableThis();
+}
+
+return {new};

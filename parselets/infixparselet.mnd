@@ -1,5 +1,6 @@
 var booleanExpression = require("expressions/booleanexpression.mnd");
 var assignExpression = require("expressions/assignexpression.mnd");
+var mathExpression = require("expressions/mathexpression.mnd");
 
 var OPERATORS = {
     ">": 0,
@@ -7,22 +8,28 @@ var OPERATORS = {
     ">=": 2,
     "<=": 3,
     "<>": 5,
-    "=": 6
+
+    "=": 6,
+
+    "+": 7,
+    "-": 8,
+    "*": 9,
+    "/": 10
 };
 
 fun parse(this) {
     var right = this.parser.parseExpression();
 
-    if(OPERATORS[this.token.lexeme] != OPERATORS["="])
+    if(OPERATORS[this.token.lexeme] < 6)
         return booleanExpression.new(OPERATORS[this.token.lexeme], this.left, right);
-    else {
-        
-
-
+    else if(OPERATORS[this.token.lexeme] == 6){
         if(this.left.type != "name")
             error("Cannot assign to non-name expression");
 
         return assignExpression.new(this.left, right);
+    }
+    else if(OPERATORS[this.token.lexeme] > 6) {
+        return mathExpression.new(OPERATORS[this.token.lexeme], this.left, right);
     }
 }
 

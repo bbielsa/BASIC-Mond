@@ -7,24 +7,24 @@ var OPERATORS = {
     NOTEQUAL: 5
 };
 
-fun evaluate(this) {
+fun evaluate(this, interpreter) {
     if(this.comparison == OPERATORS.GREATERTHAN) {
-        return this.left.evaluate() > this.right.evaluate();
+        return this.left.evaluate(interpreter) > this.right.evaluate(interpreter);
     }
     else if(this.comparison == OPERATORS.LESSTHAN) {
-        return this.left.evaluate() < this.right.evaluate();
+        return this.left.evaluate(interpreter) < this.right.evaluate(interpreter);
     }
     else if(this.comparison == OPERATORS.GREATERTHANEQUAL) {
-        return this.left.evaluate() >= this.right.evaluate();
+        return this.left.evaluate(interpreter) >= this.right.evaluate(interpreter);
     }
     else if(this.comparison == OPERATORS.LESSTHANEQUAL) {
-        return this.left.evaluate() <= this.right.evaluate();
+        return this.left.evaluate(interpreter) <= this.right.evaluate(interpreter);
     }
     else if(this.comparison == OPERATORS.EQUAL) {
-        return this.left.evaluate() == this.right.evaluate();
+        return this.left.evaluate(interpreter) == this.right.evaluate(interpreter);
     }
     else if(this.comparison == OPERATORS.NOTEQUAL) {
-        return this.left.evaluate() != this.right.evaluate();
+        return this.left.evaluate(interpreter) != this.right.evaluate(interpreter);
     }
 }
 

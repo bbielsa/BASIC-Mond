@@ -2,7 +2,7 @@ var multipleExpression = require("expressions/multipleexpression.mnd");
 
 fun parse(this) {
     while(!this.parser.match("newline") && this.parser.tokenStream.lookAhead(0).type != undefined) {
-        printLn(this.parser.tokenStream.lookAhead(0).type);
+        //printLn(this.parser.tokenStream.lookAhead(0).type);
         this.expressions.add(this.parser.parseExpression());
     }
 

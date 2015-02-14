@@ -1,0 +1,13 @@
+fun run(this, interpreter) {
+    interpreter.setLine(this.branch.evaluate());
+}
+
+fun new(branch) {
+    return {
+        branch: branch,
+        type: "goto",
+        run: run
+    }.enableThis();
+}
+
+return {new};

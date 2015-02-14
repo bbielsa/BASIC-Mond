@@ -13,7 +13,10 @@ var STATEMENTS = [
     "THEN",
     "GOSUB",
     "PRINT",
-    "INPUT"
+    "INPUT",
+    "GOTO",
+    "RETURN",
+    "END"
 ];
 
 fun isStatement(token) {
@@ -87,6 +90,13 @@ fun parseExpression(this){
         var gtExpression = gt.parse();
 
         return gtExpression;
+    }
+    if(this.match("+") || this.match("-") || this.match("*") || this.match("/")) {
+        var token = this.tokenStream.consume();
+        var math = infixParselet.new(this, token, left);
+        var mathExpression = math.parse();
+
+        return mathExpression;
     }
     else if(this.match("=")) {
         var token = this.tokenStream.consume();

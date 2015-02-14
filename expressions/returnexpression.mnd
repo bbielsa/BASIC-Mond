@@ -1,0 +1,12 @@
+fun run(this, interpreter) {
+    interpreter.inSubroutine = false;
+}
+
+fun new() {
+    return {
+        type: "return",
+        run: run
+    }.enableThis();
+}
+
+return {new};

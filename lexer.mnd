@@ -1,5 +1,5 @@
 var LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-var SYMBOLS = ";:=+-*/()<>";
+var SYMBOLS = ";:=+-*/()<>.";
 var TOKENS = {
     NUMBER: 0,
     LETTER: 1,
@@ -75,19 +75,21 @@ fun scanNumber(this) {
     var num = "";
     var n = this._current();
 
-    while(type(n) == TOKENS.NUMBER)
+
+    while(type(n) == TOKENS.NUMBER || this._peek(1) == ".")
     {
         num += n;
 
         if(!this._hasMore())
             break;
 
-        if(type(this._peek(1)) == TOKENS.NUMBER)
+        if(type(this._peek(1)) == TOKENS.NUMBER || this._peek(1) == ".") {
             n = this._next();
+        }
         else
             break;
     }
-
+    //printLn(this._peek(1));
     return Json.deserialize(num);
 }
 

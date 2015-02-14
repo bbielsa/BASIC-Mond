@@ -1,9 +1,9 @@
-fun evaluate(this) {
-    return this.right.evaluate();
+fun evaluate(this, interpreter) {
+    return this.right.evaluate(interpreter);
 }
 
 fun run(this, interpreter) {
-
+    interpreter.variables[this.name.name] = this.right.evaluate(interpreter);
 }
 
 fun new(name, right) {

@@ -1,0 +1,13 @@
+fun run(this, interpreter) {
+    interpreter.variables[this.destination.name] = readLn();
+}
+
+fun new(destination) {
+    return {
+        type: "input",
+        destination: destination,
+        run: run
+    }.enableThis();
+}
+
+return {new};

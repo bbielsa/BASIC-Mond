@@ -1,0 +1,58 @@
+var lexer = require("lexer.mnd");
+var parser = require("parser.mnd");
+var interpreter = require("interpreter.mnd");
+
+fun assert(value, correct) {
+    return value == correct;
+}
+
+var id = 0;
+fun test(program, variable, correct) {
+    var l = lexer.new(program);
+    var p = parser.new(l.scan());
+
+    var expressions = [];
+
+    for(var line = 0; line < l.input.split("\n").length(); line++) {
+        var lineExpression = p.parseLineExpression();
+        var lineNumber = lineExpression[0];
+        var expression = lineExpression[1];
+
+        expressions.add({line: lineNumber, expression: expression});
+
+        if(p.match("newline"))
+            p.tokenStream.consume(); // consume new line
+    }
+
+    var i = interpreter.new(expressions, true);
+    i.interpret();
+
+    var status = assert(i.variables[variable], correct) ? "passed" : "failed";
+    printLn("Test #{0}:\t{1}".format(id, status));
+    id++;
+}
+
+test("10 PRINT 'HELLO WORLD'", "A", undefined);
+test("10 A = 1", "A", 1);
+test("19 B = 69", "B", 69);
+test("10 A = 79
+20 B = 10
+30 C = A - B", "C", 69);
+test("10 A = 79: B = 10: C = A - B", "C", 69);
+test("10 PRINT FART( RND(69) )", "A", undefined);
+test("10 A = INT(69/3)", "A", 23);
+test("10 A = 69
+20 PRINT 'I love to';A", "A", 69);
+test("10 GOTO 69", "A", undefined);
+test("10 GOSUB 30
+20 PRINT 'should see this once'
+30 PRINT 'YAY!'
+40 RETURN", "A", undefined);
+test("10 GOSUB 69
+20 END
+69 A = 69", "A", 69);
+
+// Tests for hamurabi
+test("100 Z=0: P=95:S=2800: H=3000: E=H-S", "E", 200);
+test("10 PRINT", "A", undefined);
+test("342 IF Q<A THEN 350", "A", undefined);
