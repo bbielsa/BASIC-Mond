@@ -16,7 +16,6 @@ fun consume(this) {
 }
 
 fun new(tokens) {
-	debugger;
     return {
         tokens: tokens,
         position: 0,

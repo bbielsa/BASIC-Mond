@@ -1,5 +1,4 @@
 var LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-//var SYMBOLS = ";:=+-*/()<>.";
 var SYMBOLS = [";", ":", "=", "+", "-", "*", "/", "(", ")", "<", ">", "<>", "<=", ">="];
 var TOKENS = {
     NUMBER: 0,
@@ -114,25 +113,9 @@ fun scanName(this) {
     return name;
 }
 
-// breaking with different symbols next to each other
-// FUNC():FUNC()
 fun scanSymbol(this) {
     var sym = "";
     var s = this._current();
-    /*
-    while(type(s) == TOKENS.SYMBOL) {
-        sym += s;
-
-        if(!this._hasMore())
-            break;
-
-        if(type(this._peek(1)) == TOKENS.SYMBOL)
-            s = this._next();
-        else
-            break;
-    }
-
-    return sym;*/
 
     if(!this._hasMore())
         return s;

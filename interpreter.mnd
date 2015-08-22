@@ -13,10 +13,7 @@ fun FART(times) {
 }
 
 fun INT(number) {
-    var str = number + "";
-    str = str.split(".")[0];
-
-    return Json.deserialize(str);
+    return Math.floor(number);
 }
 
 fun interpret(this) {
@@ -81,9 +78,11 @@ seq standardInput() {
 }
 
 fun new(expressions, inputStream, ignoreOutput) {
-    if(inputStream == undefined) {
+    if(inputStream == undefined || inputStream == null) {
         inputStream = standardInput;
-        printLn("Using standard input");
+
+        if(!ignoreOutput)
+            printLn("Using standard input");
     }
 
     return {

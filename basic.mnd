@@ -9,34 +9,18 @@ var lexer = require("lexer.mnd");
 var parser = require("parser.mnd");
 var interpreter = require("interpreter.mnd");
 
-//var f = File.readAllText("hamurabi.bas").trim();
-//var l = lexer.new(f);
-
-var l = lexer.new("0 PRINT 'GUESS THE PASSWORD'
-10 A = 'FART'
-20 INPUT B
-30 IF A <> B THEN 10
-40 PRINT 'YOU GUESSED THE PASSWORD'");
-
-//var l = lexer.new("10 INPUT A");
-
-var tokens = l.scan();
-/*
-foreach(var t in tokens)
-    printLn("{0}: {1}".format(t.type, t.lexeme));
-*/
 
 seq inputStream() {
     while(true)
         yield "100";
 }
 
-//foreach(var t in tokens)
-//    printLn("[{0}]: {1}".format(t.type, t.lexeme));
-
+var program = "0 A = 10
+10 PRINT 'HELLO WORLD!'";
+var l = lexer.new(program);
+var tokens = l.scan();
 var p = parser.new(tokens);
 
-//printLn(p.tokenStream.lookAhead(0).type, p.getPrecedence());
 var expressions = [];
 
 for(var line = 0; line < l.input.split("\n").length(); line++) {
@@ -51,15 +35,6 @@ for(var line = 0; line < l.input.split("\n").length(); line++) {
 }
 
 var i = interpreter.new(expressions);
-/*
-var CURRENTFILE = "";
-i.functions.FOPEN = fun(uri) {
-    CURRENTFILE = uri;
-};
-i.functions.FREAD = fun() -> File.readAllText(CURRENTFILE);
-i.functions.FWRITE = fun(contents) {
-    File.writeAllText(CURRENTFILE, contents + "");
-};
-*/
+
 i.interpret();
 printLn(i.variables["A"]);

@@ -7,13 +7,16 @@ fun assert(value, correct) {
 }
 
 var id = 0;
-fun test(program, variable, correct) {
+
+fun runTest(program, variable, correct) {
     var l = lexer.new(program);
     var p = parser.new(l.scan());
 
     var expressions = [];
 
     for(var line = 0; line < l.input.split("\n").length(); line++) {
+        if(id == 13)
+            debugger;
         var lineExpression = p.parseLineExpression();
         var lineNumber = lineExpression[0];
         var expression = lineExpression[1];
@@ -21,23 +24,36 @@ fun test(program, variable, correct) {
         expressions.add({line: lineNumber, expression: expression});
 
         if(p.match("newline"))
-            p.tokenStream.consume(); // consume new line
+            p.tokenStream.consume();
     }
 
-    var i = interpreter.new(expressions, true);
+    var i = interpreter.new(expressions, null, true);
 
-    try(i.interpret);
-    //printLn(l.input);
-    var status = assert(i.variables[variable], correct) ? "passed" : "failed";
-    printLn("Test #{0}:\t{1}".format(id, status));
+    i.interpret();
+    var status = assert(i.variables[variable], correct);
 
-    if(status == "failed")
-        printLn("\t" + program);
+    return status;
+}
 
+fun test(program, variable, correct) {
+    var result = try(runTest, program, variable, correct);
+    var status = result.result;
+    var errorMessage = "";
+
+    if(result.error) {
+        status = false;
+        errorMessage = result.error;
+    }
+
+    var message = status ? "passed" : "failed";
+    printLn("Test #{0}:\t{1}\t{2}".format(id, message, errorMessage));
     id++;
 }
+
+
 printLn("BASIC-Mond tests",
         "================\n");
+
 test("10 PRINT 'HELLO WORLD'", "A", undefined);
 test("10 A = 1", "A", 1);
 test("19 KILLOWATT = 69", "KILLOWATT", 69);
@@ -66,116 +82,3 @@ test("10 REM *** THIS IS A TEST OF COMMENTS
 11 C = 69
 20 REM PRINT THE VALUE OF C IF IT IS EQUAL TO 69
 30 IF C = 69 PRINT 'YES!'", "C", 69);
-
-// Tests for hamurabi
-test("10 PRINT TAB(32);'HAMURABI'");
-test("20 PRINT TAB(15);'CREATIVE COMPUTING  MORRISTOWN, NEW JERSEY'");
-test("30 PRINT:PRINT:PRINT");
-test("80 PRINT 'TRY YOUR HAND AT GOVERNING ANCIENT SUMERIA'");
-test("90 PRINT 'FOR A TEN-YEAR TERM OF OFFICE.':PRINT");
-debugger;
-test("95 D1=0: P1=0");
-test("100 Z=0: P=95:S=2800: H=3000: E=H-S");
-test("110 Y=3: A=H/Y: I=5: Q=1");
-test("210 D=0");
-test("215 PRINT:PRINT:PRINT 'HAMURABI:  I BEG TO REPORT TO YOU,': Z=Z+1");
-test("217 PRINT 'IN YEAR';Z;',';D;'PEOPLE STARVED,';I;'CAME TO THE CITY,'");
-test("218 P=P+I");
-test("227 IF Q>0 THEN 230");
-test("228 P=INT(P/2)");
-test("229 PRINT 'A HORRIBLE PLAGUE STRUCK!  HALF THE PEOPLE DIED.'");
-test("230 PRINT 'POPULATION IS NOW';P");
-test("232 PRINT 'THE CITY NOW OWNS ';A;'ACRES.'");
-test("235 PRINT 'YOU HARVESTED';Y;'BUSHELS PER ACRE.'");
-test("250 PRINT 'THE RATS ATE';E;'BUSHELS.'");
-test("260 PRINT 'YOU NOW HAVE ';S;'BUSHELS IN STORE.': PRINT");
-test("270 IF Z=11 THEN 860");
-test("310 C=INT( 10 * RND(1) ) : Y=C+17");
-test("312 PRINT 'LAND IS TRADING AT';Y;'BUSHELS PER ACRE.'");
-test("320 PRINT 'HOW MANY ACRES DO YOU WISH TO BUY';");
-test("321 INPUT Q: IF Q<0 THEN 850");
-test("322 IF Y*Q<=S THEN 330");
-test("323 GOSUB 710");
-test("324 GOTO 320");
-test("330 IF Q=0 THEN 340");
-test("331 A=A+Q: S=S-Y*Q: C=0");
-test("334 GOTO 400");
-test("340 PRINT 'HOW MANY ACRES DO YOU WISH TO SELL';");
-test("341 INPUT Q: IF Q<0 THEN 850");
-test("342 IF Q<A THEN 350");
-test("343 GOSUB 720");
-test("344 GOTO 340");
-test("350 A=A-Q: S=S+Y*Q: C=0");
-test("400 PRINT");
-test("410 PRINT 'HOW MANY BUSHELS DO YOU WISH TO FEED YOUR PEOPLE';");
-test("411 INPUT Q");
-test("412 IF Q<0 THEN 850");
-test("420 IF Q<=S THEN 430");
-test("421 GOSUB 710");
-test("422 GOTO 410");
-test("430 S=S-Q: C=1: PRINT");
-test("440 PRINT 'HOW MANY ACRES DO YOU WISH TO PLANT WITH SEED';");
-test("441 INPUT D: IF D=0 THEN 511");
-test("442 IF D<0 THEN 850");
-test("445 IF D<=A THEN 450");
-test("446 GOSUB 720");
-test("447 GOTO 440");
-test("450 IF INT(D/2)<=S THEN 455");
-test("452 GOSUB 710");
-test("453 GOTO 440");
-test("455 IF D<10*P THEN 510");
-test("460 PRINT 'BUT YOU HAVE ONLY';P;'PEOPLE TO TEND THE FIELDS!  NOW THEN,'");
-test("470 GOTO 440");
-test("510 S=S-INT(D/2)");
-test("511 GOSUB 869");
-test("515 Y=C: H=D*Y: E=0");
-test("521 GOSUB 800");
-test("522 IF INT(C/2) <> C/2 THEN 530");
-test("525 E=INT(S/C)");
-test("530 S=S-E+H");
-test("531 GOSUB 800");
-test("10 PRINT 'FART' : PRINT 'FART' : PRINT 'FART' : PRINT 'FART'");
-//test("533 I=INT(C * (20*A+S) / P /100+1)");
-test("540 C=INT(Q/20)");
-test("542 Q=INT(10*(2*RND(1)-.3))");
-test("550 IF P<C THEN 210");
-test("552 D=P-C: IF D>.45*P THEN 560");
-test("553 P1=((Z-1)*P1+D*100/P) /Z");
-test("555 P=C: D1=D1+D: GOTO 215");
-test("560 PRINT: PRINT 'YOU STARVED';D;'PEOPLE IN ONE YEAR!!!'");
-test("565 PRINT 'DUE TO THIS EXTREME MISMANAGEMENT YOU HAVE NOT ONLY'");
-test("566 PRINT 'BEEN IMPEACHED AND THROWN OUT OF OFFICE BUT YOU HAVE'");
-test("567 PRINT 'ALSO BEEN DECLARED NATIONAL FINK!!!!': GOTO 990");
-test("710 PRINT 'HAMURABI:  THINK AGAIN.  YOU HAVE ONLY'");
-test("711 PRINT S;'BUSHELS OF GRAIN.  NOW THEN,'");
-test("712 RETURN");
-test("720 PRINT 'HAMURABI:  THINK AGAIN.  YOU OWN ONLY';A;'ACRES.  NOW THEN,'");
-test("730 RETURN");
-test("800 C=INT(RND(1)*5)+1");
-test("801 RETURN");
-test("850 PRINT: PRINT 'HAMURABI:  I CANNOT DO WHAT YOU WISH.'");
-test("855 PRINT 'GET YOURSELF ANOTHER STEWARD!!!!!'");
-test("857 GOTO 990");
-test("860 PRINT 'IN YOUR 10-YEAR TERM OF OFFICE,';P1;'PERCENT OF THE'");
-test("862 PRINT 'POPULATION STARVED PER YEAR ON THE AVERAGE, I.E. A TOTAL OF'");
-test("865 PRINT D1;'PEOPLE DIED!!': L=A/P");
-test("870 PRINT 'YOU STARTED WITH 10 ACRES PER PERSON AND ENDED WITH'");
-test("875 PRINT L;'ACRES PER PERSON.': PRINT");
-test("880 IF P1>33 THEN 565");
-test("885 IF L<7 THEN 565");
-test("890 IF P1>10 THEN 940");
-test("892 IF L<9 THEN 940");
-test("895 IF P1>3 THEN 960");
-test("896 IF L<10 THEN 960");
-test("900 PRINT 'A FANTASTIC PERFORMANCE!!!  CHARLEMANGE, DISRAELI, AND'");
-test("905 PRINT 'JEFFERSON COMBINED COULD NOT HAVE DONE BETTER!':GOTO 990");
-test("940 PRINT 'YOUR HEAVY-HANDED PERFORMANCE SMACKS OF NERO AND IVAN IV.'");
-test("945 PRINT 'THE PEOPLE (REMIANING) FIND YOU AN UNPLEASANT RULER, AND,'");
-test("950 PRINT 'FRANKLY, HATE YOUR GUTS!!':GOTO 990");
-test("960 PRINT 'YOUR PERFORMANCE COULD HAVE BEEN SOMEWHAT BETTER, BUT'");
-test("965 PRINT 'REALLY WASN'T TOO BAD AT ALL. ';INT(P*.8*RND(1));'PEOPLE'");
-test("970 PRINT 'WOULD DEARLY LIKE TO SEE YOU ASSASSINATED BUT WE ALL HAVE OUR'");
-test("975 PRINT 'TRIVIAL PROBLEMS.'");
-test("990 PRINT: FOR N=1 TO 10: PRINT CHR$(7);: NEXT N");
-test("995 PRINT 'SO LONG FOR NOW.': PRINT");
-test("999 END");
