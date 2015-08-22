@@ -1,11 +1,18 @@
 var callExpression = require("expressions/callexpression.mnd");
 
-fun parse(this, parser, name, argument) {
-    return callExpression.new(name, argument);
+fun parse(this, parser, name, precedence, argument) {
+    //debugger;
+    //printLn("POSTFIX ARGUMENT:\t" + name);
+    //error("help");
+    
+    var arg = parser.parseExpression(0);
+    parser.tokenStream.consume(); //consume )
+    return callExpression.new(argument, arg);
 }
 
 fun new() {
     return {
+        type: "postfix",
         parse: parse
     }.enableThis();
 }

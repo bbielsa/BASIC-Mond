@@ -1,0 +1,29 @@
+// websocket bindings test
+
+var ws = Websocket("ws://fpp.literallybrian.com", 12000);
+ws.onMessage(fun(msg) {
+    printLn("GOT MESSAGE: " + msg);
+});
+
+ws.onConnected(fun(success) {
+    if(success)
+    {
+        printLn("sending");
+        while(true)
+            ws.send(readLn());
+    }
+    else
+        printLn("Could not connect");
+});
+
+ws.onDisconnected(fun() {
+    printLn("Disconnected");
+});
+
+Async.start(seq() {
+    while(true) {
+        yield Task.delay(1);
+    }
+});
+
+Async.runToCompletion();

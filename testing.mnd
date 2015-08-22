@@ -1,7 +1,31 @@
 var lexer = require("lexer.mnd");
 var parser = require("parser.mnd");
+var interpreter = require("interpreter.mnd");
 
-var tokens = lexer.new("A = 1 - 2").scan();
+//10 PRINT 'ENTER YOUR NAME:' : INPUT A : PRINT 'HELLO, ' ; A : PRINT '' : GOTO 10
+var l= lexer.new("10 A = 1 - 2 - 3");
+var tokens = l.scan();
+
+//foreach(var t in tokens)
+    //printLn("[{0}: {1}]".format(t.type, t.lexeme));
+
 var p = parser.new(tokens);
-var exp = p.parseExpression(0);
-//printLn(exp.serialize());
+var expressions = [];
+
+for(var line = 0; line < l.input.split("\n").length(); line++) {
+    var lineExpression = p.parseLineExpression();
+    var lineNumber = lineExpression[0];
+    var expression = lineExpression[1];
+
+    expressions.add({line: lineNumber, expression: expression});
+
+    if(p.match("newline"))
+        p.tokenStream.consume(); // consume new line
+    else
+        break;
+}
+
+var i = interpreter.new(expressions);
+i.interpret();
+printLn(l.input);
+printLn(i.variables["A"]);

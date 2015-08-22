@@ -8,31 +8,50 @@ var returnExpression = require("expressions/returnexpression.mnd");
 var endExpression = require("expressions/endexpression.mnd");
 
 fun parse(this, parser, token) {
-    var operand = parser.parseExpression();
+    //printLn("PARSING CONDITION");
+    //if(token.lexeme == "RETURN")
+        //debugger;
 
+    //printLn("DONE");
+    //printLn("LEXEME:\t" + token.lexeme);
     if(token.lexeme == "PRINT") {
+        var operand = parser.parseExpression(0);
+        
+        if(operand == null)
+            return printExpression.new({});
+
         var expressions = [operand];
+
         while(parser.tokenStream.lookAhead(0).type == ";") {
             parser.tokenStream.consume();
-            expressions.add(parser.parseExpression());
+            expressions.add(parser.parseExpression(0));
         }
         return printExpression.new(expressions);
     }
     else if(token.lexeme == "IF") {
+        //debugger;
+        var operand = parser.parseExpression(0, true);
         var condition = operand;
-        var branch = parser.parseExpression();
+        //printLn("CONDITION.TYPE:\t" + condition.type);
+
+        var branch = parser.parseExpression(0);
         return ifExpression.new(condition, branch);
     }
     else if(token.lexeme == "THEN") {
+        //printLn("GOT HERE!");
+        var operand = parser.parseExpression(0);
         return thenExpression.new(operand);
     }
     else if(token.lexeme == "INPUT") {
+        var operand = parser.parseExpression(0);
         return inputExpression.new(operand);
     }
     else if(token.lexeme == "GOSUB") {
+        var operand = parser.parseExpression(0);
         return gosubExpression.new(operand);
     }
     else if(token.lexeme == "GOTO") {
+        var operand = parser.parseExpression(0);
         return gotoExpression.new(operand);
     }
     else if(token.lexeme == "RETURN") {
@@ -41,11 +60,16 @@ fun parse(this, parser, token) {
     else if(token.lexeme == "END") {
         return endExpression.new();
     }
+    else if(token.lexeme == "FOR") {
+        printLn("GOT HERE!");
+        error("Not yet implemented");
+    }
 }
 
 fun new() {
     return {
-        parse: parse
+        parse: parse,
+        type: "statement"
     }.enableThis();
 }
 

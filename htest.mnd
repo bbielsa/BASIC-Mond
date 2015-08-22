@@ -1,79 +1,8 @@
-var lexer = require("lexer.mnd");
-var parser = require("parser.mnd");
-var interpreter = require("interpreter.mnd");
-
-fun assert(value, correct) {
-    return value == correct;
-}
-
-var id = 0;
-fun test(program, variable, correct) {
-    var l = lexer.new(program);
-    var p = parser.new(l.scan());
-
-    var expressions = [];
-
-    for(var line = 0; line < l.input.split("\n").length(); line++) {
-        var lineExpression = p.parseLineExpression();
-        var lineNumber = lineExpression[0];
-        var expression = lineExpression[1];
-
-        expressions.add({line: lineNumber, expression: expression});
-
-        if(p.match("newline"))
-            p.tokenStream.consume(); // consume new line
-    }
-
-    var i = interpreter.new(expressions, true);
-
-    try(i.interpret);
-    //printLn(l.input);
-    var status = assert(i.variables[variable], correct) ? "passed" : "failed";
-    printLn("Test #{0}:\t{1}".format(id, status));
-
-    if(status == "failed")
-        printLn("\t" + program);
-
-    id++;
-}
-printLn("BASIC-Mond tests",
-        "================\n");
-test("10 PRINT 'HELLO WORLD'", "A", undefined);
-test("10 A = 1", "A", 1);
-test("19 KILLOWATT = 69", "KILLOWATT", 69);
-test("10 A = 79
-20 B = 10
-30 C = A - B", "C", 69);
-test("10 A = 79: B = 10: C = A - B", "C", 69);
-test("10 PRINT FART( RND(69) )", "A", undefined);
-test("10 A = INT(69/3)", "A", 23);
-test("10 A = 69
-20 PRINT 'I love to';A", "A", 69);
-test("10 GOTO 69", "A", undefined);
-test("10 GOSUB 30
-20 PRINT 'should see this once'
-30 PRINT 'YAY!'
-40 RETURN", "A", undefined);
-test("10 GOSUB 69
-20 END
-69 A = 69", "A", 69);
-test("10 A = 1 - 2 - 3", "A", -4);
-test("0 IF 69 = NUM('69') THEN 30
-10 END
-20 END
-30 A = 69", "A", 69);
-test("10 REM *** THIS IS A TEST OF COMMENTS
-11 C = 69
-20 REM PRINT THE VALUE OF C IF IT IS EQUAL TO 69
-30 IF C = 69 PRINT 'YES!'", "C", 69);
-
-// Tests for hamurabi
 test("10 PRINT TAB(32);'HAMURABI'");
 test("20 PRINT TAB(15);'CREATIVE COMPUTING  MORRISTOWN, NEW JERSEY'");
 test("30 PRINT:PRINT:PRINT");
 test("80 PRINT 'TRY YOUR HAND AT GOVERNING ANCIENT SUMERIA'");
 test("90 PRINT 'FOR A TEN-YEAR TERM OF OFFICE.':PRINT");
-debugger;
 test("95 D1=0: P1=0");
 test("100 Z=0: P=95:S=2800: H=3000: E=H-S");
 test("110 Y=3: A=H/Y: I=5: Q=1");
@@ -90,7 +19,7 @@ test("235 PRINT 'YOU HARVESTED';Y;'BUSHELS PER ACRE.'");
 test("250 PRINT 'THE RATS ATE';E;'BUSHELS.'");
 test("260 PRINT 'YOU NOW HAVE ';S;'BUSHELS IN STORE.': PRINT");
 test("270 IF Z=11 THEN 860");
-test("310 C=INT( 10 * RND(1) ) : Y=C+17");
+test("310 C=INT(10*RND(1)): Y=C+17");
 test("312 PRINT 'LAND IS TRADING AT';Y;'BUSHELS PER ACRE.'");
 test("320 PRINT 'HOW MANY ACRES DO YOU WISH TO BUY';");
 test("321 INPUT Q: IF Q<0 THEN 850");
@@ -110,6 +39,7 @@ test("400 PRINT");
 test("410 PRINT 'HOW MANY BUSHELS DO YOU WISH TO FEED YOUR PEOPLE';");
 test("411 INPUT Q");
 test("412 IF Q<0 THEN 850");
+test("418 REM *** TRYING TO USE MORE GRAIN THAN IS IN SILOS?");
 test("420 IF Q<=S THEN 430");
 test("421 GOSUB 710");
 test("422 GOTO 410");
@@ -117,30 +47,38 @@ test("430 S=S-Q: C=1: PRINT");
 test("440 PRINT 'HOW MANY ACRES DO YOU WISH TO PLANT WITH SEED';");
 test("441 INPUT D: IF D=0 THEN 511");
 test("442 IF D<0 THEN 850");
+test("444 REM *** TRYING TO PLANT MORE ACRES THAN YOU OWN?");
 test("445 IF D<=A THEN 450");
 test("446 GOSUB 720");
 test("447 GOTO 440");
+test("449 REM *** ENOUGH GRAIN FOR SEED?");
 test("450 IF INT(D/2)<=S THEN 455");
 test("452 GOSUB 710");
 test("453 GOTO 440");
+test("454 REM *** ENOUGH PEOPLE TO TEND THE CROPS?");
 test("455 IF D<10*P THEN 510");
 test("460 PRINT 'BUT YOU HAVE ONLY';P;'PEOPLE TO TEND THE FIELDS!  NOW THEN,'");
 test("470 GOTO 440");
 test("510 S=S-INT(D/2)");
-test("511 GOSUB 869");
+test("511 GOSUB 800");
+test("512 REM *** A BOUNTIFUL HARVEST!");
 test("515 Y=C: H=D*Y: E=0");
 test("521 GOSUB 800");
-test("522 IF INT(C/2) <> C/2 THEN 530");
+test("522 IF INT(C/2)<>C/2 THEN 530");
+test("523 REM *** RATS ARE RUNNING WILD!!");
 test("525 E=INT(S/C)");
 test("530 S=S-E+H");
 test("531 GOSUB 800");
-test("10 PRINT 'FART' : PRINT 'FART' : PRINT 'FART' : PRINT 'FART'");
-//test("533 I=INT(C * (20*A+S) / P /100+1)");
+test("532 REM *** LET'S HAVE SOME BABIES");
+test("533 I=INT(C*(20*A+S)/P/100+1)");
+test("539 REM *** HOW MANY PEOPLE HAD FULL TUMMIES?");
 test("540 C=INT(Q/20)");
+test("541 REM *** HORROS, A 15% CHANCE OF PLAGUE");
 test("542 Q=INT(10*(2*RND(1)-.3))");
 test("550 IF P<C THEN 210");
+test("551 REM *** STARVE ENOUGH FOR IMPEACHMENT?");
 test("552 D=P-C: IF D>.45*P THEN 560");
-test("553 P1=((Z-1)*P1+D*100/P) /Z");
+test("553 P1=((Z-1)*P1+D*100/P)/Z");
 test("555 P=C: D1=D1+D: GOTO 215");
 test("560 PRINT: PRINT 'YOU STARVED';D;'PEOPLE IN ONE YEAR!!!'");
 test("565 PRINT 'DUE TO THIS EXTREME MISMANAGEMENT YOU HAVE NOT ONLY'");

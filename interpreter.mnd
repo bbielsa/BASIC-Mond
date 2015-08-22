@@ -9,7 +9,6 @@ fun rep(str, times) {
 var random = Random();
 
 fun FART(times) {
-    printLn(times);
     return rep("FART ", times);
 }
 
@@ -44,6 +43,7 @@ fun step(this) {
     else
         this.expressions[this.line++].expression.run(this);
 
+    return {};
 }
 
 fun interpretSubroutine(this, start) {
@@ -75,7 +75,17 @@ fun setLine(this, destination) {
     this.running = false;
 }
 
-fun new(expressions, ignoreOutput) {
+seq standardInput() {
+    while(true)
+        yield readLn();
+}
+
+fun new(expressions, inputStream, ignoreOutput) {
+    if(inputStream == undefined) {
+        inputStream = standardInput;
+        printLn("Using standard input");
+    }
+
     return {
         expressions: expressions,
         line: 0,
@@ -85,13 +95,16 @@ fun new(expressions, ignoreOutput) {
         variables: {},
         functions: {
             TAB: fun(times) -> rep("  ", times),
-            RND: fun(max) -> random.next(max + 1),
+            RND: fun(max) -> random.nextDouble() % max,
+            NUM: fun(str) -> Json.deserialize(str),
+            //HTTPGET: fun(url) -> Http.get(url),
             FART: FART,
             INT: INT
         },
 
         interpret: interpret,
         interpretSubroutine: interpretSubroutine,
+        inputStream: inputStream().getEnumerator(),
         step: step,
         setLine: setLine
     }.enableThis();

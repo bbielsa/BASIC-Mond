@@ -1,5 +1,8 @@
 fun run(this, interpreter) {
-    interpreter.variables[this.destination.name] = readLn();
+    if(interpreter.inputStream.moveNext())
+        interpreter.variables[this.destination.name] = interpreter.inputStream.current;
+    else
+        error("Reached end of input stream");
 }
 
 fun new(destination) {

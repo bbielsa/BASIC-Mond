@@ -1,5 +1,6 @@
 fun run(this, interpreter) {
-    if(this.condition.evaluate()) {
+
+    if(this.condition.evaluate(interpreter)) {
         this.branch.run(interpreter);
     }
 }

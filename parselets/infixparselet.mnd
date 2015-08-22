@@ -17,30 +17,39 @@ var OPERATORS = {
     "/": 10
 };
 
-fun parse(this, parser, token, left) {
-
-
+fun parse(this, parser, token, precedence, left, comparison) {
     if(OPERATORS[token.lexeme] < 6)
     {
-        var right = parser.parseExpression(parser.getPrecedence() - 1);
+        var right = parser.parseExpression(0);
         return booleanExpression.new(OPERATORS[token.lexeme], left, right);
     }
     else if(OPERATORS[token.lexeme] == 6){
-        var right = parser.parseExpression(parser.getPrecedence());
-        if(left.type != "name")
-            error("Cannot assign to non-name expression");
+        if(!comparison)
+        {
 
-        return assignExpression.new(left, right);
+            var right = parser.parseExpression(parser.getPrecedence());
+
+            if(left.type != "name")
+                error("Cannot assign to non-name expression");
+
+                return assignExpression.new(left, right);
+        }
+        else
+        {
+            var right = parser.parseExpression(0);
+            return booleanExpression.new(OPERATORS[token.lexeme], left, right);
+        }
     }
     else if(OPERATORS[token.lexeme] > 6) {
-        var right = parser.parseExpression(parser.getPrecedence() - 1);
+        var right = parser.parseExpression(3);
         return mathExpression.new(OPERATORS[token.lexeme], left, right);
     }
 }
 
 fun new() {
     return {
-        parse: parse
+        parse: parse,
+        type: "infix"
     }.enableThis();
 }
 
