@@ -3,7 +3,8 @@ fun evaluate(this, interpreter) {
 }
 
 fun run(this, interpreter) {
-    interpreter.variables[this.name.name] = this.right.evaluate(interpreter);
+    var value = this.right.evaluate(interpreter);
+    interpreter.variables[this.name.name] = value;
 }
 
 fun new(name, right) {

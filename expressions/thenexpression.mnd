@@ -1,5 +1,9 @@
+/*
+    THEN STATEMENT EXPRESSION
+        Jumps to the line given
+*/
 fun run(this, interpreter) {
-    interpreter.setLine(this.branch.evaluate());
+    interpreter.setLine(this.branch.evaluate(interpreter));
 }
 
 fun new(branch) {

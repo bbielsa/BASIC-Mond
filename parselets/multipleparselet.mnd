@@ -1,18 +1,33 @@
 var multipleExpression = require("expressions/multipleexpression.mnd");
 
 fun parse(this, parser, first) {
-    var expressions = [first];
+    this.expressions = [first];
 
-    while(!parser.match("newline") && parser.tokenStream.lookAhead(0).type != undefined) {
-        expressions.add(parser.parseExpression());
+    while(parser.tokenStream.hasMore() && !parser.match("newline")) {
+        //printLn("MATCH:\t" + parser.match("newline"));
+        var exp = parser.parseExpression(0);
+
+        if(exp != null)
+            this.expressions.add(exp);
     }
 
-    return multipleExpression.new(expressions);
+
+    //while(parser.match(":")) {
+    //    parser.tokenStream.consume();
+    //    this.expressions.add(parser.parseExpression(0));
+    //}
+
+
+    
+
+    return multipleExpression.new(this.expressions);
 }
 
 fun new() {
     return {
-        parse: parse
+        parse: parse,
+        expressions: [],
+        type: "multiple"
     }.enableThis();
 }
 

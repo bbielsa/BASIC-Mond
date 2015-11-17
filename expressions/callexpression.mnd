@@ -1,7 +1,25 @@
 var stringExpression = require("expressions/stringexpression.mnd");
 
+fun rep(str, times) {
+    var s = "";
+
+    for(var i = 0; i < times; i++)
+        s += str;
+
+    return s;
+}
+
+fun FART(times) {
+    //printLn(times);
+    return rep("FART ", times);
+}
+
 fun evaluate(this, interpreter) {
-    return interpreter.functions[this.name](this.argument.evaluate(interpreter));
+    //printLn("GOT HERE!");
+    //printLn("ARGUMENT:\t" + this.argument.evaluate());
+    //FART(this.argument.evaluate());
+    
+    return interpreter.functions[this.name.name](this.argument.evaluate(interpreter));
 }
 
 fun new(name, argument) {

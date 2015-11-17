@@ -16,8 +16,30 @@ var STATEMENTS = [
     "INPUT",
     "GOTO",
     "RETURN",
-    "END"
+    "END",
+    "FOR"
 ];
+
+var PRECEDENCES = {
+    "=": 1,
+    "statement": 0,
+    "(": 2,
+    ")": 2,
+
+    ">": 2,
+    "<": 2,
+    ">=": 2,
+    "<=": 2,
+    "<>": 2,
+
+    "+": 3,
+    "-": 3,
+
+    "*": 4,
+    "/": 4,
+
+    ":": 5
+};
 
 fun isStatement(token) {
     if(token.type != "name")
@@ -33,69 +55,81 @@ fun match(this, expected) {
 
 fun parseLineExpression(this) {
     if(!this.match("number")) {
-        printLn("TOKEN:\t" + this.tokenStream.lookAhead(0).type);
+        //printLn("TOKEN:\t" + this.tokenStream.lookAhead(0).type);
+        //debugger;
         error("No preceeding line number found.");
     }
 
     var number = this.tokenStream.consume().lexeme;
-    var left = this.parseExpression();
-    var multiple = multipleParselet.new(this, left);
-    var multipleExpression = null;
 
-    while(this.match(":")) {
-        this.tokenStream.consume();
-        multiple.expressions.add(this.parseExpression());
-    }
+    //if(this.tokenStream.lookAhead(0).type == "name")
+    //    debugger;
+    //debugger;
 
-    if(multiple.expressions.length() > 1)
-        multipleExpression = multiple.parse();
+    var left = this.parseExpression(0);
+
+    var multiple = multipleParselet.new();
+    //debugger;
+    var multipleExpression = multiple.parse(this, left);
+
+    if(multiple.expressions.length() <= 1)
+        multipleExpression = null;
+
+    //printLn(this.tokenStream.lookAhead(0).type);
+    //this.tokenStream.consume(); // consume the new line
 
     return [number, multipleExpression || left];
 }
 
 fun getPrecedence(this) {
-    var token = this.tokenStream.lookAhead(0).type;
-    printLn("PRECEDENCE:\t" + token);
-    if(token == "=") {
-        return 1;
-    }
-    else if(token == ">" || token == "<" || token == ">=" || token == "<=" || token == "<>") {
-        return 2;
-    }
-    else if(token == "+" || token == "-") {
-        return 3;
-    }
-    else if(token == "*" || token == "/") {
-        return 4;
-    }
-    else if(token == "name" || token == "string" || token == "number") {
-        return 6;
-    }
-    else if(token == "(") {
-        return 7;
-    }
+    var token = this.tokenStream.lookAhead(0).lexeme;
+    var parselet = this.infixParselets[token] || this.postfixParselets[token];
 
-    return 0;
+    //if(isStatement(this.tokenStream.lookAhead(0)))
+    //    return 1;
+
+    return parselet ? PRECEDENCES[token] : 0;
 }
 
-fun parseExpression(this, precedence) {
+fun parseExpression(this, precedence, comparison) {
+    if(!this.tokenStream.hasMore())
+        return null;
+
     var token = this.tokenStream.consume();
     var prefix = this.prefixParselets[token.type];
+
+    if(isStatement(token))
+        prefix = this.prefixParselets["statement"];
+
+    if(token.lexeme == ":" || token.lexeme == "\n")
+    {
+        return null;
+    }
 
     if(prefix == undefined)
         error("Illegal token `{0}`".format(token.lexeme));
 
     var left = prefix.parse(this, token);
 
-    printLn(this.getPrecedence());
+    if(this.tokenStream.lookAhead(0)) {
+        var t = this.tokenStream.lookAhead(0).type;
 
+        if(this.postfixParselets[t]) {
+            token = this.tokenStream.consume();
+            left = this.postfixParselets[t].parse(this, token, precedence, left, comparison);
+        }
+    }
+    //printLn(this.getPrecedence());
+    //printLn("'{2}': {0} < {1}".format(precedence, this.getPrecedence(), this.tokenStream.lookAhead(0).lexeme));
     // does not handle postfix expressions yet
     while(precedence < this.getPrecedence()) {
+        //debugger;
         token = this.tokenStream.consume();
-        var infix = this.infixParselets[token.type];
-        printLn(token.type);
-        var fart = infix.parse(this, token, left);
-        printLn(fart.serialize());
+        //printLn("TOKEN.LEXEME:\t" + token.lexeme);
+        var parselet = this.infixParselets[token.type];// || this.postfixParselets[token.type];
+        //printLn(parselet.type);
+//        printLn()
+        left = parselet.parse(this, token, precedence, left, comparison);
     }
 
     return left;

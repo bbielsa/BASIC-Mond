@@ -1,41 +1,42 @@
+/*
+    TODO:
+        -Ignore lines with comments
+        -Parenthetical mathematical expressions
+
+*/
+
 var lexer = require("lexer.mnd");
 var parser = require("parser.mnd");
 var interpreter = require("interpreter.mnd");
 
-//var l = lexer.new(readLn());
-/*var l = lexer.new("10 PRINT 'HELLO': PRINT 'WORLD': a = 1
-20 PRINT 'NEW LINE!!!'
-30 PRINT FART(20)
-40 PRINT 'THIS IS A TEST'
-50 IF 1 <> 2 THEN 10");
-*/
-/*
-var l = lexer.new("10 PRINT RND(69)
-20 IF 1<2 THEN 10");
-*/
-//var l = lexer.new("20 PRINT TAB(15) ; 'CREATIVE COMPUTING  MORRISTOWN, NEW JERSEY'");
-//var l = lexer.new("10 INPUT A");
-/*var l = lexer.new("0 A = 69
-10 PRINT 'HELLO';'WORLD';A");*/
-//var l = lexer.new("10 A = FART( RND(6) )");
-/*var l = lexer.new("10 A = 79
-20 B = 10
-30 C = A - B");*/
-/*var l = lexer.new("10 A = RND(69)");*/
+//var f = File.readAllText("hamurabi.bas").trim();
+//var l = lexer.new(f);
 
-//var l = lexer.new("10 PRINT 'HELLO WORLD!':PRINT:PRINT:PRINT 'HELLO AGAIN!!' PRINT RND(69)");
-var l = lexer.new("10 GOSUB 30
-20 PRINT 'should see this once'
-30 PRINT 'YAY!'
-40 RETURN");
+var l = lexer.new("0 PRINT 'GUESS THE PASSWORD'
+10 A = 'FART'
+20 INPUT B
+30 IF A <> B THEN 10
+40 PRINT 'YOU GUESSED THE PASSWORD'");
+
+//var l = lexer.new("10 INPUT A");
+
 var tokens = l.scan();
 /*
 foreach(var t in tokens)
     printLn("{0}: {1}".format(t.type, t.lexeme));
 */
 
+seq inputStream() {
+    while(true)
+        yield "100";
+}
+
+//foreach(var t in tokens)
+//    printLn("[{0}]: {1}".format(t.type, t.lexeme));
+
 var p = parser.new(tokens);
-printLn(p.tokenStream.lookAhead(0).type, p.getPrecedence());
+
+//printLn(p.tokenStream.lookAhead(0).type, p.getPrecedence());
 var expressions = [];
 
 for(var line = 0; line < l.input.split("\n").length(); line++) {
@@ -50,5 +51,15 @@ for(var line = 0; line < l.input.split("\n").length(); line++) {
 }
 
 var i = interpreter.new(expressions);
+/*
+var CURRENTFILE = "";
+i.functions.FOPEN = fun(uri) {
+    CURRENTFILE = uri;
+};
+i.functions.FREAD = fun() -> File.readAllText(CURRENTFILE);
+i.functions.FWRITE = fun(contents) {
+    File.writeAllText(CURRENTFILE, contents + "");
+};
+*/
 i.interpret();
 printLn(i.variables["A"]);

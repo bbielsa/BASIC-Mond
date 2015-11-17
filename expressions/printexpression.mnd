@@ -4,7 +4,8 @@ fun run(this, interpreter) {
 	for(var e = 0; e < this.expressions.length(); e++)
 		value += this.expressions[e].evaluate(interpreter) + " ";
 
-	printLn(value);
+	if(interpreter.ignoreOutput != true)
+		printLn(value);
 }
 
 fun new(expressions) {

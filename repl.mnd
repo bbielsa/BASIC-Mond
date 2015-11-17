@@ -1,0 +1,33 @@
+var lexer = require("lexer.mnd");
+var parser = require("parser.mnd");
+var interpreter = require("interpreter.mnd");
+
+var i = interpreter.new();
+var expressions = [];
+
+while(true) {
+    var input = readLn();
+
+    if(input == "RUN") {
+        i.expressions = expressions;
+        i.interpret();
+        expressions = [];
+        continue;
+    }
+
+    var l = lexer.new(input);
+    var tokens = l.scan();
+    var p = parser.new(tokens);
+//    var expressions = [];
+
+    for(var line = 0; line < l.input.split("\n").length(); line++) {
+        var lineExpression = p.parseLineExpression();
+        var lineNumber = lineExpression[0];
+        var expression = lineExpression[1];
+
+        expressions.add({line: lineNumber, expression: expression});
+
+        if(p.match("newline"))
+            p.tokenStream.consume(); // consume new line
+    }
+}

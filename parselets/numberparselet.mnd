@@ -6,7 +6,8 @@ fun parse(this, parser, token) {
 
 fun new() {
     return {
-        parse: parse
+        parse: parse,
+        type: "number"
     }.enableThis();
 }
 

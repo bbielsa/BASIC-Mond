@@ -1,5 +1,6 @@
 var LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-var SYMBOLS = ";:=+-*/()<>.";
+//var SYMBOLS = ";:=+-*/()<>.";
+var SYMBOLS = [";", ":", "=", "+", "-", "*", "/", "(", ")", "<", ">", "<>", "<=", ">="];
 var TOKENS = {
     NUMBER: 0,
     LETTER: 1,
@@ -23,7 +24,7 @@ fun type(token) {
         return TOKENS.LETTER;
     else if(token.trim() == "")
         return TOKENS.WHITESPACE;
-    else if(SYMBOLS.indexOf(token) > -1)
+    else if(SYMBOLS.contains(token))
         return TOKENS.SYMBOL;
 
 }
@@ -76,7 +77,7 @@ fun scanNumber(this) {
     var n = this._current();
 
 
-    while(type(n) == TOKENS.NUMBER || this._peek(1) == ".")
+    while(type(n) == TOKENS.NUMBER || this._peek(0) == ".")
     {
         num += n;
 
@@ -89,7 +90,7 @@ fun scanNumber(this) {
         else
             break;
     }
-    //printLn(this._peek(1));
+
     return Json.deserialize(num);
 }
 
@@ -97,14 +98,14 @@ fun scanName(this) {
     var name = "";
     var n = this._current();
 
-    while(type(n) == TOKENS.LETTER)
+    while(type(n) == TOKENS.LETTER || type(n) == TOKENS.NUMBER)
     {
         name += n;
 
         if(!this._hasMore())
             break;
 
-        if(type(this._peek(1)) == TOKENS.LETTER)
+        if(type(this._peek(1)) == TOKENS.LETTER || type(this._peek(1)) == TOKENS.NUMBER)
             n = this._next();
         else
             break;
@@ -118,7 +119,7 @@ fun scanName(this) {
 fun scanSymbol(this) {
     var sym = "";
     var s = this._current();
-
+    /*
     while(type(s) == TOKENS.SYMBOL) {
         sym += s;
 
@@ -131,7 +132,25 @@ fun scanSymbol(this) {
             break;
     }
 
-    return sym;
+    return sym;*/
+
+    if(!this._hasMore())
+        return s;
+
+    var ss = s + this._peek(1);
+    if(SYMBOLS.contains(ss))
+    {
+        this._next();
+        return ss;
+    }
+    else
+        return s;
+}
+
+fun scanComment(this) {
+    var n = this._current();
+    while(this._hasMore() && type(n) != TOKENS.LF)
+        n = this._next();
 }
 
 fun scan(this) {
@@ -144,7 +163,16 @@ fun scan(this) {
         else if(type(n) == TOKENS.NUMBER)
             this.tokens.add({type: "number", lexeme: this._scanNumber()});
         else if(type(n) == TOKENS.LETTER)
-            this.tokens.add({type: "name", lexeme: this._scanName()});
+        {
+            var name = this._scanName();
+            if(name == "REM")
+            {
+                this._scanComment();
+                this.tokens.removeAt(this.tokens.length() - 1); // remove the line number of the comment from the token list
+            }
+            else
+                this.tokens.add({type: "name", lexeme: name});
+        }
         else if(type(n) == TOKENS.SYMBOL)
         {
             var symbol = this._scanSymbol();
@@ -174,6 +202,7 @@ fun new(input) {
         _scanNumber: scanNumber,
         _scanName: scanName,
         _scanSymbol: scanSymbol,
+        _scanComment: scanComment,
         _current: current,
         _hasMore: hasmore,
         _next: next,

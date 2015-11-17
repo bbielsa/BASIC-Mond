@@ -3,10 +3,14 @@ fun lookAhead(this, distance) {
         return this.tokens[this.position + distance];
 }
 
+fun hasMore(this) {
+    return this.position < this.tokens.length();
+}
+
 // return the consumed token?
 fun consume(this) {
     var token = this.tokens[this.position];
-    this.tokens = this.tokens.removeAt(this.position);
+    this.tokens.removeAt(this.position);
     //printLn(token.lexeme);
     return token;
 }
@@ -17,7 +21,8 @@ fun new(tokens) {
         position: 0,
 
         lookAhead: lookAhead,
-        consume: consume
+        consume: consume,
+        hasMore: hasMore
     }.enableThis();
 }
 

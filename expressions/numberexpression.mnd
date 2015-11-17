@@ -1,6 +1,7 @@
 fun new(num) {
     return {
         evaluate: fun() -> num,
+        number: num,
         type:"number"
     }.enableThis();
 }

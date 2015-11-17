@@ -3,28 +3,38 @@ var OPERATORS = {
     LESSTHAN: 1,
     GREATERTHANEQUAL: 2,
     LESSTHANEQUAL: 3,
-    EQUAL: 4,
-    NOTEQUAL: 5
+    NOTEQUAL: 5,
+    EQUAL: 6
 };
 
 fun evaluate(this, interpreter) {
+
+    var left = this.left.evaluate(interpreter) + "";
+    var right = this.right.evaluate(interpreter) + "";
+
+    left = Json.deserialize(left);
+    right = Json.deserialize(right);
+    
+
+
     if(this.comparison == OPERATORS.GREATERTHAN) {
-        return this.left.evaluate(interpreter) > this.right.evaluate(interpreter);
+        return left > right;
     }
     else if(this.comparison == OPERATORS.LESSTHAN) {
-        return this.left.evaluate(interpreter) < this.right.evaluate(interpreter);
+        return left < right;
     }
     else if(this.comparison == OPERATORS.GREATERTHANEQUAL) {
-        return this.left.evaluate(interpreter) >= this.right.evaluate(interpreter);
+        return left >= right;
     }
     else if(this.comparison == OPERATORS.LESSTHANEQUAL) {
-        return this.left.evaluate(interpreter) <= this.right.evaluate(interpreter);
+        return left <= right;
     }
     else if(this.comparison == OPERATORS.EQUAL) {
-        return this.left.evaluate(interpreter) == this.right.evaluate(interpreter);
+
+        return left == right;
     }
     else if(this.comparison == OPERATORS.NOTEQUAL) {
-        return this.left.evaluate(interpreter) != this.right.evaluate(interpreter);
+        return left != right;
     }
 }
 
