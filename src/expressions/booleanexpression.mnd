@@ -9,8 +9,12 @@ var OPERATORS = {
 
 fun evaluate(this, interpreter) {
 
-    var left = this.left.evaluate(interpreter) + "";
-    var right = this.right.evaluate(interpreter) + "";
+    var left = this.left.evaluate(interpreter);
+    var right = this.right.evaluate(interpreter);
+
+
+    printLn(left.getType());
+    printLn(right.getType());
 
     left = Json.deserialize(left);
     right = Json.deserialize(right);
